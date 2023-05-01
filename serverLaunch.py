@@ -17,9 +17,6 @@ actions_autorisees = ["ConsulterVol",
                       "ConsulterHistorique", "RecevoirFacture", "Reservation", "Annulation"]
 current_threads = []
 msgsize = 1024
-facture = "factures.txt"
-compte = "vols.txt"
-hist = "histo.txt"
 
 
 # Gestion des clients a travers les threads
@@ -80,7 +77,6 @@ def TraitementServeur(ip, message, csock):
     if elements[0] == "Reservation":
         mutex.acquire()
         msg = reserver(elements[1], ref_agence, elements[2])
-        maj_facture(ref_agence)
         mutex.release()
         csock.send(bytes(msg, 'UTF-8'))
     if elements[0] == "Annulation":

@@ -1,4 +1,5 @@
 import os
+from facture import maj_facture
 
 
 def creer_fichier_histo():
@@ -69,11 +70,12 @@ def reserver(reference_vol, agence, nombre_places):
                     # Mettre à jour l'historique des transactions avec succès
                     maj_historique(reference_vol, agence,
                                    'Demande', nombre_places, 'succès')
+                    maj_facture(agence)
                     return "MAJ fait, résultat succées"
                 else:
                     # Mettre à jour l'historique des transactions avec échec
                     maj_historique(reference_vol, agence,
-                                   'Demander', nombre_places, 'impossible')
+                                   'Demande', nombre_places, 'impossible')
                     return "MAJ fait, résultat impossible"
             # Si la référence du vol n'est pas trouvée,
     return "Pas de vol avec cette référence"
@@ -82,6 +84,19 @@ def reserver(reference_vol, agence, nombre_places):
 
 
 def annuler(reference_vol, agence, nombre_places):
+    # verifier le nbre de places reservé par l'agence
+    with open('histo.txt', 'r') as fh:
+        next(fh)
+        places = 0
+        for ligne in fh:
+            ref_v, ref_agence, trans, val, res = ligne.strip().split('\t\t')
+            if(ref_v == reference_vol and agence == ref_agence and res == 'succès'):
+                if trans == 'Annulation':
+                    places -= int(val)
+                if trans == 'Demande':
+                    places += int(val)
+        if(places < int(nombre_places) or int(nombre_places) == 0):
+            return "Annulation impossible: nbre de places ne correspond pas"
     with open('vols.txt', 'r') as f:
         # Lire le contenu du fichier ligne par ligne
         for ligne in f:
@@ -110,7 +125,7 @@ def annuler(reference_vol, agence, nombre_places):
                     f_vols.truncate()
 
                 # Mettre à jour l'historique des transactions avec succès
-                maj_historique(reference_vol, agence, 'Annuler',
+                maj_historique(reference_vol, agence, 'Annulation',
                                nombre_places, 'succès')
                 return "MAJ faite, résultat succées"
    # Si la référence du vol n'est pas trouvée,

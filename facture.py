@@ -29,6 +29,7 @@ def consulter_facture(reference):
 
 
 def maj_facture(ref_agence):
+    print("mise à jour de la facture")
     with open('histo.txt', 'r') as fh:
         next(fh)
         s = 0
