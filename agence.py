@@ -26,9 +26,7 @@ def consulterTransaction(agence):
 
 def consulterFacture(agence):
     clear()
-    print("Veuillez saisir la référence de l'agence pour consulter facture :")
-    ref = input()
-    agence.sendall(bytes("RecevoirFacture,{}".format(ref), 'UTF-8'))
+    agence.sendall(bytes("RecevoirFacture", 'UTF-8'))
 
 
 # une des actions effectue par l'agence : transaction qui présente la demande et l'annulation des places du vol en faisant les mise-a-jour necessaires

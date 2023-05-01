@@ -8,7 +8,7 @@ def creer_fichier_vols():
         f.write('RéférenceVol\tDestination\tNombre Places\tPrix Place\n')
         # Écrire les données des vols
         f.write('1000\t\tParis\t\t20\t\t500\n')
-        f.write('2000\t\tMedina\t\t10\t\t25000\n')
+        f.write('2000\t\tMedina\t\t10\t\t2500\n')
         f.write('3000\t\tMontréal\t\t40\t\t3500\n')
         f.write('4000\t\tDubai\t\t15\t\t3000\n')
         f.write('5000\t\tMaroc\t\t30\t\t2500\n')

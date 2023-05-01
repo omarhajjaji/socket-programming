@@ -29,7 +29,7 @@ def maj_historique(reference_vol, agence, transaction, valeur, resultat):
     with open('histo.txt', 'a') as f:
         # Écrire une nouvelle ligne avec les informations de la transaction
         f.write(
-            f"{reference_vol}\t\t\t{agence}\t\t{transaction}\t\t\t{valeur}\t\t{resultat}\n")
+            f"{reference_vol}\t\t{agence}\t\t{transaction}\t\t{valeur}\t\t{resultat}\n")
 
 # Fonction pour effectuer une réservation
 
@@ -96,7 +96,7 @@ def annuler(reference_vol, agence, nombre_places):
                 if trans == 'Demande':
                     places += int(val)
         if(places < int(nombre_places) or int(nombre_places) == 0):
-            return "Annulation impossible: nbre de places ne correspond pas"
+            return "Annulation impossible"
     with open('vols.txt', 'r') as f:
         # Lire le contenu du fichier ligne par ligne
         for ligne in f:
@@ -127,6 +127,7 @@ def annuler(reference_vol, agence, nombre_places):
                 # Mettre à jour l'historique des transactions avec succès
                 maj_historique(reference_vol, agence, 'Annulation',
                                nombre_places, 'succès')
+                maj_facture(agence)
                 return "MAJ faite, résultat succées"
    # Si la référence du vol n'est pas trouvée,
     return "Pas de vol avec cette référence"

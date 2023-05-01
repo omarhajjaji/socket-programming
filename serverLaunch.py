@@ -4,7 +4,6 @@ from fileinput import close
 from platform import release
 import socket
 import threading
-import math
 from vol import *
 from historique import *
 from facture import consulter_facture, maj_facture
@@ -72,7 +71,7 @@ def TraitementServeur(ip, message, csock):
    # if elements[0] == "ConsulterHistorique": !!!!!!!!!!!!C'est exclusif à l'agence!!!!!!!!
     #    msg = afficher_historique(elements[1])
     if elements[0] == "RecevoirFacture":
-        msg = consulter_facture(elements[0])
+        msg = consulter_facture(ref_agence)
         csock.send(bytes(msg, 'UTF-8'))
     if elements[0] == "Reservation":
         mutex.acquire()

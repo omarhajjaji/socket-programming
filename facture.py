@@ -36,15 +36,19 @@ def maj_facture(ref_agence):
         for ligne in fh:
             ref_v, agence, trans, val, res = ligne.strip().split('\t\t')
             if ref_agence == agence:
+                print('facture: Agence existe')
                 if trans == 'Demande' and res == 'succès':
+                    print('facture: Vol existe (demande)')
                     with open('vols.txt', 'r') as fv:
                         next(fv)
                         for l in fv:
                             ch = l.strip().split('\t\t')
                             if int(ch[0]) == int(ref_v):
+
                                 prix_place = ch[3]
                                 s = s + (int(prix_place) * int(val))
                 elif trans == 'Annulation':
+                    print('facture: Vol existe (annulation)')
                     with open('vols.txt', 'r') as fv:
                         next(fv)
                         for l in fv:
@@ -56,11 +60,28 @@ def maj_facture(ref_agence):
             else:
                 print("Pas de transactions pour cette agence " + ref_agence)
         if s != 0:
-            with open("facture.txt", "r") as f:
-                lines = f.readlines()
-            with open("facture.txt", "w") as f:
-                for line in lines:
-                    ref, somme = line.strip().split('\t\t')
-                    if ref == ref_agence:
-                        somme = int(somme) + s
-                    f.write(f"{ref}\t\t{somme}\n")
+            print("S=", s)
+            isUpdated = False
+            nouvelle_ligne = f"{ref_agence}\t\t{s}\n"
+            contenu = ''
+            # Ouvrir le fichier en mode lecture/écriture
+            with open('facture.txt', 'r+') as f_facture:
+                # Lire le contenu du fichier ligne par ligne
+                for ligne_facture in f_facture:
+                    # Remplacer la ligne correspondante par la nouvelle ligne mise à jour
+
+                    if ligne_facture.startswith(ref_agence):
+                        contenu += nouvelle_ligne
+                        isUpdated = True
+                    else:
+                        contenu += ligne_facture
+                # Rembobiner le curseur du fichier au début
+                f_facture.seek(0)
+                # Écrire le contenu mis à jour dans le fichier
+                f_facture.write(contenu)
+                # Si pas de mise à jour => nouvelle facture
+                if (not(isUpdated)):
+                    f_facture.write(nouvelle_ligne)
+                # Tronquer le fichier après la dernière ligne écrite
+                f_facture.truncate()
+                # Si aucune facture ne correspond (nouvelle facture)
