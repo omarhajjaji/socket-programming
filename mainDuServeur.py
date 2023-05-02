@@ -36,7 +36,8 @@ if __name__ == '__main__':
         if(int(response) == 1):
             print("Veuillez saisir la référence du vol à consulter: ", end="")
             reference = input()
-            consulter_vol(reference)
+            reslt = consulter_vol(reference)
+            print(reslt)
             print("Entrer pour continuer...", end="")
             input()
         if(int(response) == 2):

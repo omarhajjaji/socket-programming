@@ -53,8 +53,8 @@ class threadClients(threading.Thread):
                     msg = " n'est pas une action autorisée!"
                     self.csocket.send(bytes(msg, 'UTF-8'))
 
-        print("Client dont l'adresse est : ",
-              self.clientAddress, " est deconnete ..")
+        log.info("Client dont l'adresse est : ",
+                 self.clientAddress, " est deconnete ..")
 # fin de la classe
 
 
@@ -65,7 +65,7 @@ def TraitementServeur(ip, message, csock):
     elements = message.split(",")
     # Reference de l'agence selon son adresse ip de
     ref_agence = ip[0].split(".")[3]
-    log.info("Reference agence= ", ref_agence)
+    log.info("Reference agence= " + ref_agence)
     if elements[0] == "ConsulterVol":
         msg = consulter_vol(elements[1])
         csock.send(bytes(msg, 'UTF-8'))
@@ -87,11 +87,11 @@ def TraitementServeur(ip, message, csock):
 
 
 def launchServer():
-    LOCALHOST = "127.0.0.1"
+    HOST = "192.168.1.7"
     PORT = 8084
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind((LOCALHOST, PORT))
+    server.bind((HOST, PORT))
 
     log.info("Serveur up")
     log.info("En attente des requetes clients..")

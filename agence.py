@@ -75,7 +75,7 @@ def actionAgence(agence):
 
 # le type du socket : SOCK_STREAM pour le protocole TCP
 # le type du socket : SOCK_DGRAM pour le protocole UDP
-SERVER = "127.0.0.1"
+SERVER = "192.168.1.7"
 PORT = 8084
 agence = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 agence.connect((SERVER, PORT))
