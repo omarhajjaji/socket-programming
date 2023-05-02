@@ -43,7 +43,8 @@ if __name__ == '__main__':
         if(int(response) == 2):
             print("Veuillez saisir la référence de l'agence: ", end="")
             ref = input()
-            consulter_facture(ref)
+            reslt = consulter_facture(ref)
+            print(reslt)
             print("Entrer pour continuer...", end="")
             input()
         if(int(response) == 3):

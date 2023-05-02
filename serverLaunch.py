@@ -42,7 +42,7 @@ class threadClients(threading.Thread):
                 log.info("Socket déconnecté !")
                 break
             rsp = data.decode()
-            if rsp != "Salut":
+            if rsp and rsp != "Salut":
                 log.info(f"Demande du client: {rsp.split(',')[0]}")
                 action = rsp.split(",")[0]
                 if action in actions_autorisees:
@@ -87,7 +87,7 @@ def TraitementServeur(ip, message, csock):
 
 
 def launchServer():
-    HOST = "192.168.1.7"
+    HOST = "172.18.2.26"
     PORT = 8084
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
