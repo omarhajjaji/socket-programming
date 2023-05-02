@@ -1,51 +1,52 @@
-# Les importations necessaires
-
-from fileinput import close
-from platform import release
 import socket
 import threading
 from vol import *
 from historique import *
-from facture import consulter_facture, maj_facture
+from facture import consulter_facture
+import logging
 
 # Mutex pour assurer l'exlusion mutuelle
 mutex = threading.Lock()
+logging.basicConfig(filename='serveur.log', level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
+log = logging.getLogger("logger")
 
 # Liste des actions autorisée par le serveur pour le client
 actions_autorisees = ["ConsulterVol",
-                      "ConsulterHistorique", "RecevoirFacture", "Reservation", "Annulation"]
+                      "RecevoirFacture", "Reservation", "Annulation"]
 current_threads = []
 msgsize = 1024
 
-
 # Gestion des clients a travers les threads
+
+
 class threadClients(threading.Thread):
 
     # Recuperer l'adresse et la socket du client connecté
     def __init__(self, clientAddress, clientsocket):
         threading.Thread.__init__(self)
+        self.clientAddress = clientAddress
         self.csocket = clientsocket
-        print("nouvelle connexion avec l'adresse: ",
-              clientAddress, ": Thread créé")
+        logging.info(
+            f"nouvelle connexion avec l'adresse: {clientAddress}: Thread créé")
 
     # Recuperer l'action autorisé pour le client connecté afin de l'excéuter
     def run(self):
-        print("Connexion de : ", clientAddress)
+        log.info(f"Connexion de : {self.clientAddress}")
         self.csocket.send(bytes("hello", 'utf-8'))
         rsp = ''
         while True:
             try:
                 data = self.csocket.recv(3072)
             except socket.error as e:
-                print("Socket déconnecté !")
+                log.info("Socket déconnecté !")
                 break
             rsp = data.decode()
             if rsp != "Salut":
-                print("Demande du client:",
-                      rsp.split(",")[0])
+                log.info(f"Demande du client: {rsp.split(',')[0]}")
                 action = rsp.split(",")[0]
                 if action in actions_autorisees:
-                    TraitementServeur(clientAddress, rsp, self.csocket)
+                    TraitementServeur(self.clientAddress, rsp, self.csocket)
                 elif rsp == 'exit':
                     break
                 else:
@@ -53,7 +54,7 @@ class threadClients(threading.Thread):
                     self.csocket.send(bytes(msg, 'UTF-8'))
 
         print("Client dont l'adresse est : ",
-              clientAddress, " est deconnete ..")
+              self.clientAddress, " est deconnete ..")
 # fin de la classe
 
 
@@ -64,7 +65,7 @@ def TraitementServeur(ip, message, csock):
     elements = message.split(",")
     # Reference de l'agence selon son adresse ip de
     ref_agence = ip[0].split(".")[3]
-    print("Reference agence= ", ref_agence)
+    log.info("Reference agence= ", ref_agence)
     if elements[0] == "ConsulterVol":
         msg = consulter_vol(elements[1])
         csock.send(bytes(msg, 'UTF-8'))
@@ -85,23 +86,23 @@ def TraitementServeur(ip, message, csock):
         csock.send(bytes(msg, 'UTF-8'))
 
 
-LOCALHOST = "127.0.0.1"
-PORT = 8084
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server.bind((LOCALHOST, PORT))
+def launchServer():
+    LOCALHOST = "127.0.0.1"
+    PORT = 8084
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((LOCALHOST, PORT))
 
-print("Serveur disponible")
-print("En attente pour les requtes des clients..")
-while True:
-    # Boucle principale
-    server.listen(1)
-    clientsock, clientAddress = server.accept()
-    # retourner le couple (socket,addresse)
-    newthread = threadClients(clientAddress, clientsock)
-    try:
-        newthread.start()
-    except e:
-        print("Erreur du serveur: ", e)
-    current_threads.append(newthread)
-server.close()
+    log.info("Serveur up")
+    log.info("En attente des requetes clients..")
+    while True:
+        # Boucle principale
+        server.listen(1)
+        clientsock, clientAddress = server.accept()
+        # retourner le couple (socket,addresse)
+        newthread = threadClients(clientAddress, clientsock)
+        try:
+            newthread.start()
+        except e:
+            log.error("Erreur du serveur: ", e)
+        current_threads.append(newthread)

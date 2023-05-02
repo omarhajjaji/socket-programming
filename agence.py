@@ -12,14 +12,6 @@ def consulterVol(agence):
     ref = input()
     agence.sendall(bytes("ConsulterVol,{}".format(ref), 'UTF-8'))
 
-# La consultation des transactions (historique)
-
-
-def consulterTransaction(agence):
-    clear()
-    print("Veuillez saisir la référence du vol pour consulter transaction :")
-    ref = input()
-    agence.sendall(bytes("ConsulterHistorique,{}".format(ref), 'UTF-8'))
 
 # La consultation des factures
 
@@ -66,18 +58,18 @@ def actionAgence(agence):
     clear()
     response = 0
     print("1- Consulter un vol")
-    print("3- Consulter la facture à payer")
-    print("4- Realiser une trasaction")
+    print("2- Consulter la facture à payer")
+    print("3- Realiser une trasaction")
     print("choix d'action :", end="")
     response = input()
     while int(response)not in [1, 2, 3, 4]:
-        print("Choix invalide! Essayez de nouveau [1,2,3,4]: ")
+        print("Choix invalide! Essayez de nouveau [1,2,3]: ")
         response = input()
     if(int(response) == 1):
         consulterVol(agence)
-    if(int(response) == 3):
+    if(int(response) == 2):
         consulterFacture(agence)
-    if(int(response) == 4):
+    if(int(response) == 3):
         transactionVol()
 
 
@@ -96,7 +88,7 @@ while True:
     if(in_data.decode() != "Salut"):
         clear()
         print("Serveur a retourné :", in_data.decode())
-        input("Press Enter to continue...")
+        input("Appuyer sur entrer pour continuer...")
 
     if(in_data.decode() == "exit"):
 

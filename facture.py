@@ -1,12 +1,15 @@
-import os
+import logging
+
+logger = logging.getLogger("logger")
 
 
 def creer_fichier_facture():
+
     # Ouvrir le fichier en mode écriture
     with open('facture.txt', 'w') as f:
         # Écrire l'en-tête
         f.write('Référence Agence\t\tSomme à payer\n')
-    print("Le fichier 'facture.txt' a été créé avec succès !")
+    logger.info("Le fichier 'facture.txt' a été créé avec succès !")
 
 
 def consulter_facture(reference):
@@ -20,25 +23,25 @@ def consulter_facture(reference):
             # Vérifier si la référence correspond
             if reference_agence == reference:
                 # Afficher les informations de la facture
-                print("Agence : " + reference)
-                print("Somme à payer : " + somme)
+                logger.info("Agence : " + reference)
+                logger.info("Somme à payer : " + somme)
                 return "Agence : " + reference + "\n" + "Somme à payer : " + somme
         # Si la référence n'a pas été trouvée
-        print("Aucune facture trouvée avec la référence " + reference)
+        logger.info("Aucune facture trouvée avec la référence " + reference)
         return("Aucune facture trouvée avec la référence " + reference)
 
 
 def maj_facture(ref_agence):
-    print("mise à jour de la facture")
+    logger.debug("mise à jour de la facture")
     with open('histo.txt', 'r') as fh:
         next(fh)
         s = 0
         for ligne in fh:
             ref_v, agence, trans, val, res = ligne.strip().split('\t\t')
             if ref_agence == agence:
-                print('facture: Agence existe')
+                logger.debug('facture: Agence existe')
                 if trans == 'Demande' and res == 'succès':
-                    print('facture: Vol existe (demande)')
+                    logger.debug('facture: Vol existe (demande)')
                     with open('vols.txt', 'r') as fv:
                         next(fv)
                         for l in fv:
@@ -48,7 +51,7 @@ def maj_facture(ref_agence):
                                 prix_place = ch[3]
                                 s = s + (int(prix_place) * int(val))
                 elif trans == 'Annulation':
-                    print('facture: Vol existe (annulation)')
+                    logger.debug('facture: Vol existe (annulation)')
                     with open('vols.txt', 'r') as fv:
                         next(fv)
                         for l in fv:
@@ -58,9 +61,10 @@ def maj_facture(ref_agence):
                                 s = s - (int(prix_place) * int(val)) + \
                                     0.1 * (int(prix_place) * int(val))
             else:
-                print("Pas de transactions pour cette agence " + ref_agence)
+                logger.info(
+                    "Pas de transactions pour cette agence " + ref_agence)
         if s != 0:
-            print("S=", s)
+            logger.debug("S=", s)
             isUpdated = False
             nouvelle_ligne = f"{ref_agence}\t\t{s}\n"
             contenu = ''
@@ -85,3 +89,4 @@ def maj_facture(ref_agence):
                 # Tronquer le fichier après la dernière ligne écrite
                 f_facture.truncate()
                 # Si aucune facture ne correspond (nouvelle facture)
+            logger.info("Facture mise à jour")

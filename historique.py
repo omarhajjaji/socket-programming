@@ -1,13 +1,15 @@
 import os
 from facture import maj_facture
+import logging
 
 
 def creer_fichier_histo():
+    logger = logging.getLogger("logger")
     # Ouvrir le fichier en mode écriture
     with open('histo.txt', 'w') as f:
         # Écrire l'en-tête
         f.write('RéférenceVol\t\tAgence\t\tTransaction\t\tValeur\t\tRésultat\n')
-    print("Le fichier 'histo.txt' a été créé avec succès !")
+    logger.info("Le fichier 'histo.txt' a été créé avec succès !")
 
 
 # Fonction pour afficher l'historique des transactions
@@ -24,17 +26,18 @@ def afficher_historique():
 
 # Fonction pour mettre à jour l'historique des transactions
 def maj_historique(reference_vol, agence, transaction, valeur, resultat):
-
+    logger = logging.getLogger("logger")
     # Ouvrir le fichier en mode ajout (append)
     with open('histo.txt', 'a') as f:
         # Écrire une nouvelle ligne avec les informations de la transaction
         f.write(
             f"{reference_vol}\t\t{agence}\t\t{transaction}\t\t{valeur}\t\t{resultat}\n")
-
+    logger.info("Historique mis à jour!")
 # Fonction pour effectuer une réservation
 
 
 def reserver(reference_vol, agence, nombre_places):
+    logger = logging.getLogger("logger")
     # Ouvrir le fichier des vols en mode lecture
     with open('vols.txt', 'r') as f:
         # Lire le contenu du fichier ligne par ligne
@@ -71,12 +74,14 @@ def reserver(reference_vol, agence, nombre_places):
                     maj_historique(reference_vol, agence,
                                    'Demande', nombre_places, 'succès')
                     maj_facture(agence)
-                    return "MAJ fait, résultat succées"
+                    logger.info("MAJ fait, résultat succées")
+                    return "Succès de mise à jour"
                 else:
                     # Mettre à jour l'historique des transactions avec échec
                     maj_historique(reference_vol, agence,
                                    'Demande', nombre_places, 'impossible')
-                    return "MAJ fait, résultat impossible"
+                    logger.info("MAJ fait, résultat impossible")
+                    return "Impossible de faire cette mise à jour"
             # Si la référence du vol n'est pas trouvée,
     return "Pas de vol avec cette référence"
 
@@ -84,6 +89,7 @@ def reserver(reference_vol, agence, nombre_places):
 
 
 def annuler(reference_vol, agence, nombre_places):
+    logger = logging.getLogger("logger")
     # verifier le nbre de places reservé par l'agence
     with open('histo.txt', 'r') as fh:
         next(fh)
@@ -128,6 +134,7 @@ def annuler(reference_vol, agence, nombre_places):
                 maj_historique(reference_vol, agence, 'Annulation',
                                nombre_places, 'succès')
                 maj_facture(agence)
-                return "MAJ faite, résultat succées"
+                logger.info("MAJ fait, résultat succès")
+                return "MAJ reussie"
    # Si la référence du vol n'est pas trouvée,
     return "Pas de vol avec cette référence"
